@@ -43,7 +43,7 @@ export default function HourClassificationModal({
     >
       <View style={styles.overlay}>
         <Pressable
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
           onPress={onClose}
           accessibilityLabel="Close popup"
         />

@@ -8,7 +8,7 @@ export const colors = {
   text: "#F5F0E9",
   textSecondary: "#A5A2AD",
   textMuted: "#777680",
-  accent: "#F16A60",
+  accent: "#279883",
   wastedBackground: "#30191C",
   wastedBorder: "#8F3E42",
   wastedText: "#FFD5D3",
