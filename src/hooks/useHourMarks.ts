@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { HourMark, SavedMarks } from "../types/hour";
 
@@ -37,6 +37,8 @@ function parseSavedMarks(value: unknown): SavedMarks {
 export function useHourMarks() {
   const [marksByDay, setMarksByDay] = useState<SavedMarks>({});
   const [storageReady, setStorageReady] = useState(false);
+  // Keep user edits made before the initial AsyncStorage read completes.
+  const pendingChangesRef = useRef<Record<string, Record<string, HourMark | null>>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -54,6 +56,23 @@ export function useHourMarks() {
       }
 
       if (isMounted) {
+        // Merge early taps on hour boxes over the stored data so loading
+        // cannot overwrite a classification made immediately after launch.
+        for (const [dayKey, pendingDay] of Object.entries(pendingChangesRef.current)) {
+          const mergedDay = { ...(loadedMarks[dayKey] ?? {}) };
+
+          for (const [hourKey, mark] of Object.entries(pendingDay)) {
+            if (mark === null) {
+              delete mergedDay[hourKey];
+            } else {
+              mergedDay[hourKey] = mark;
+            }
+          }
+
+          loadedMarks[dayKey] = mergedDay;
+        }
+        pendingChangesRef.current = {};
+
         setMarksByDay(loadedMarks);
         setStorageReady(true);
       }
@@ -76,6 +95,14 @@ export function useHourMarks() {
 
   const setHourMark = useCallback(
     (dayKey: string, hour: number, mark: HourMark | null) => {
+      if (!storageReady) {
+        const pendingDay = pendingChangesRef.current[dayKey] ?? {};
+        pendingChangesRef.current[dayKey] = {
+          ...pendingDay,
+          [String(hour)]: mark,
+        };
+      }
+
       setMarksByDay((previous) => {
         const updatedDay = { ...(previous[dayKey] ?? {}) };
         const hourKey = String(hour);
@@ -89,7 +116,7 @@ export function useHourMarks() {
         return { ...previous, [dayKey]: updatedDay };
       });
     },
-    []
+    [storageReady]
   );
 
   return { marksByDay, storageReady, setHourMark };

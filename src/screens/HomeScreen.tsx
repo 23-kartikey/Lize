@@ -15,12 +15,14 @@ import TimeSummary from "../components/TimeSummary";
 import { colors } from "../constants/theme";
 import { useClock } from "../hooks/useClock";
 import { useHourMarks } from "../hooks/useHourMarks";
+import { useAccentColor } from "../hooks/useAccentColor";
 import type { HourMark, SelectedHour } from "../types/hour";
 import { getDayKey } from "../utils/time";
 
 export default function HomeScreen() {
   const now = useClock();
   const { marksByDay, storageReady, setHourMark } = useHourMarks();
+  const { accentId, accentColor, setAccentId } = useAccentColor();
   const [selectedTarget, setSelectedTarget] = useState<SelectedHour>(null);
 
   const todayKey = getDayKey(now);
@@ -45,13 +47,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={colors.background} barStyle="light-content" />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <BrandHeader />
+        <BrandHeader accentId={accentId} accentColor={accentColor} onSelectAccent={setAccentId} />
 
         <TimeSummary
           now={now}
@@ -59,16 +61,17 @@ export default function HomeScreen() {
           remainingMinutes={remainingMinutes}
           wastedHours={wastedHours}
           classifiedHours={wastedHours + notWastedHours}
+          accentColor={accentColor}
         />
 
         <HourGrid
           currentHour={currentHour}
           dayMarks={todayMarks}
-          disabled={!storageReady}
           onSelectHour={(hour) => setSelectedTarget({ hour, dayKey: todayKey })}
+          accentColor={accentColor}
         />
 
-        <HourLegend />
+        <HourLegend accentColor={accentColor} />
 
         <Text style={styles.footer}>
           A diagonal strike means the hour has passed.{"\n"}
@@ -89,6 +92,7 @@ export default function HomeScreen() {
         currentHour={currentHour}
         onClose={() => setSelectedTarget(null)}
         onSaveMark={saveSelectedMark}
+        accentColor={accentColor}
       />
     </SafeAreaView>
   );

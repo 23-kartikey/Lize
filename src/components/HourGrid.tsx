@@ -6,15 +6,15 @@ import { formatHour, HOURS } from "../utils/time";
 type Props = {
   currentHour: number;
   dayMarks: DayMarks;
-  disabled?: boolean;
   onSelectHour: (hour: number) => void;
+  accentColor: string;
 };
 
 export default function HourGrid({
   currentHour,
   dayMarks,
-  disabled = false,
   onSelectHour,
+  accentColor,
 }: Props) {
   return (
     <>
@@ -44,7 +44,6 @@ export default function HourGrid({
           return (
             <Pressable
               key={hour}
-              disabled={disabled}
               onPress={() => onSelectHour(hour)}
               accessibilityRole="button"
               accessibilityLabel={`${formatHour(hour)}, ${statusLabel}. Tap to classify.`}
@@ -81,8 +80,8 @@ export default function HourGrid({
                 {statusLabel}
               </Text>
 
-              {hasPassed && <View pointerEvents="none" style={styles.crossOut} />}
-              {isCurrent && <View style={styles.currentIndicator} />}
+              {hasPassed && <View pointerEvents="none" style={[styles.crossOut, { backgroundColor: accentColor }]} />}
+              {isCurrent && <View style={[styles.currentIndicator, { backgroundColor: accentColor }]} />}
             </Pressable>
           );
         })}

@@ -8,6 +8,7 @@ type Props = {
   remainingMinutes: number;
   wastedHours: number;
   classifiedHours: number;
+  accentColor: string;
 };
 
 export default function TimeSummary({
@@ -16,11 +17,12 @@ export default function TimeSummary({
   remainingMinutes,
   wastedHours,
   classifiedHours,
+  accentColor,
 }: Props) {
   return (
     <>
       <View style={styles.intro}>
-        <Text style={styles.date}>{formatDateLabel(now)}</Text>
+        <Text style={[styles.date, { color: accentColor }]}>{formatDateLabel(now)}</Text>
         <Text style={styles.title}>Time is passing.</Text>
         <Text style={styles.subtitle}>Every hour is a part of your life.</Text>
       </View>
@@ -32,14 +34,14 @@ export default function TimeSummary({
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>TIME LEFT</Text>
-          <Text style={styles.remainingValue}>{formatDuration(remainingMinutes)}</Text>
+          <Text style={[styles.remainingValue, { color: accentColor }]}>{formatDuration(remainingMinutes)}</Text>
         </View>
       </View>
 
       <View style={styles.wasteSummary}>
         <View style={styles.wasteSummaryLeft}>
           <Text style={styles.wasteSummaryLabel}>MARKED AS WASTED</Text>
-          <Text style={styles.wasteSummaryValue}>{formatDuration(wastedHours * 60)}</Text>
+          <Text style={[styles.wasteSummaryValue, { color: accentColor }]}>{formatDuration(wastedHours * 60)}</Text>
         </View>
         <View style={styles.summaryRight}>
           <Text style={styles.summaryCount}>{classifiedHours}/24</Text>

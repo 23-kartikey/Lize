@@ -8,6 +8,7 @@ This folder contains the refactored source for the current offline Android app. 
 - Tap an hour to mark it **Wasted** or **Not wasted**
 - Wasted-time and classification summaries
 - Local persistence by date using AsyncStorage
+- User-selectable Orange, Pink, or White accent color, saved on the device
 
 ## How to copy these files into your existing project
 
@@ -37,12 +38,14 @@ This folder contains the refactored source for the current offline Android app. 
 - `src/components/HourLegend.tsx` — grid legend
 - `src/hooks/useClock.ts` — current time updates and foreground refresh
 - `src/hooks/useHourMarks.ts` — load/save marks locally by date
-- `src/constants/theme.ts` — shared colors
+- `src/hooks/useAccentColor.ts` — load/save selected accent color
+- `src/constants/theme.ts` — shared colors and accent choices
 - `src/types/hour.ts` — TypeScript types
 - `src/utils/time.ts` — date and time formatting utilities
 
 ## Notes
 
 - No Spring Boot backend is needed for this version.
-- Hour classifications are saved on this device; AsyncStorage is not encrypted storage.
+- Hour classifications and accent preference are saved on this device; AsyncStorage is not encrypted storage.
+- The accent selector changes accent-colored text and small highlights. The dark background and the wasted/not-wasted status colors stay the same.
 - Each marked slot counts as 60 minutes, even if the hour is in the future. This is manual classification, not automatic app usage tracking.

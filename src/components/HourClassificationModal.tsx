@@ -10,6 +10,7 @@ type Props = {
   currentHour: number;
   onClose: () => void;
   onSaveMark: (mark: HourMark | null) => void;
+  accentColor: string;
 };
 
 export default function HourClassificationModal({
@@ -19,6 +20,7 @@ export default function HourClassificationModal({
   currentHour,
   onClose,
   onSaveMark,
+  accentColor,
 }: Props) {
   const hour = selectedTarget?.hour;
   const isToday = selectedTarget?.dayKey === todayKey;
@@ -50,7 +52,7 @@ export default function HourClassificationModal({
 
         <View style={styles.card}>
           <View style={styles.topRow}>
-            <Text style={styles.eyebrow}>CLASSIFY THIS HOUR</Text>
+            <Text style={[styles.eyebrow, { color: accentColor }]}>CLASSIFY THIS HOUR</Text>
             <Pressable
               onPress={onClose}
               style={styles.closeButton}
@@ -108,7 +110,7 @@ export default function HourClassificationModal({
 
           {selectedMark && (
             <Pressable onPress={() => onSaveMark(null)} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>Clear classification</Text>
+              <Text style={[styles.clearButtonText, { color: accentColor }]}>Clear classification</Text>
             </Pressable>
           )}
 

@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/theme";
 
-export default function HourLegend() {
+type Props = { accentColor: string };
+
+export default function HourLegend({ accentColor }: Props) {
   return (
     <View style={styles.legend}>
       <View style={styles.legendItem}>
-        <View style={[styles.legendDot, styles.wastedDot]} />
+        <View style={[styles.legendDot, styles.wastedDot, { backgroundColor: accentColor }]} />
         <Text style={styles.legendText}>Wasted</Text>
       </View>
       <View style={styles.legendItem}>

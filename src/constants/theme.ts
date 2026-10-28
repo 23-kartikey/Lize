@@ -1,3 +1,16 @@
+export const accentOptions = [
+  { id: "orange", label: "Orange", color: "#F16A60" },
+  { id: "pink", label: "Pink", color: "#FF65A3" },
+  { id: "white", label: "White", color: "#F5F0E9" },
+  {id: "green", label: "Green", color: "#26b656"}
+] as const;
+
+export type AccentId = (typeof accentOptions)[number]["id"];
+
+export function getAccentColor(id: AccentId): string {
+  return accentOptions.find((option) => option.id === id)?.color ?? "#F16A60";
+}
+
 export const colors = {
   background: "#0B0B0D",
   surface: "#17171B",
@@ -8,7 +21,7 @@ export const colors = {
   text: "#F5F0E9",
   textSecondary: "#A5A2AD",
   textMuted: "#777680",
-  accent: "#279883",
+  accent: "#F16A60",
   wastedBackground: "#30191C",
   wastedBorder: "#8F3E42",
   wastedText: "#FFD5D3",
