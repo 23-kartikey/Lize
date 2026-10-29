@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { Component, ComponentRef, useEffect, useRef, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -42,9 +42,12 @@ export default function HourClassificationModal({
     setDraftNote(selectedNote);
   }, [selectedTarget?.dayKey, selectedTarget?.hour, selectedNote]);
 
+  const [pressed, setPressed] = useState(false);
+  const noteInputRef = useRef<ComponentRef<typeof TextInput>>(null);
+
   const hour = selectedTarget?.hour;
   const isToday = selectedTarget?.dayKey === todayKey;
-
+  const hasPassed = hour===undefined?false:hour<currentHour;
   const description =
     hour === undefined
       ? "Choose how you want to classify this hour."
@@ -60,7 +63,7 @@ export default function HourClassificationModal({
     <Modal
       visible={selectedTarget !== null}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
       statusBarTranslucent
     >
@@ -96,10 +99,11 @@ export default function HourClassificationModal({
           <Text style={styles.noteLabel}>NOTE FOR THIS HOUR</Text>
 
           <TextInput
+            ref = {noteInputRef}
             style={styles.noteInput}
             value={draftNote}
             onChangeText={setDraftNote}
-            placeholder="What did you do during this hour?"
+            placeholder={hasPassed?"What did you do during this hour?":"What do you plan to do?"}
             placeholderTextColor={colors.textMuted}
             multiline
             maxLength={180}
@@ -110,14 +114,18 @@ export default function HourClassificationModal({
             <Text style={styles.noteCount}>{draftNote.length}/180</Text>
 
             <Pressable
-              onPress={() => onSaveNote(draftNote)}
+              onPress={() =>{
+                onSaveNote(draftNote);
+                setPressed(true);
+                noteInputRef.current?.blur();
+              }}
               style={({ pressed }) => [
                 styles.saveNoteButton,
                 { backgroundColor: accentColor },
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.saveNoteText}>Save note</Text>
+              <Text style={styles.saveNoteText}>{pressed?"Saved":"Save note"}</Text>
             </Pressable>
           </View>
 

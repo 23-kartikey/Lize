@@ -48,7 +48,7 @@ export default function BrandHeader({ accentId, accentColor, onSelectAccent }: P
       <Modal
         visible={pickerVisible}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setPickerVisible(false)}
         statusBarTranslucent
       >
