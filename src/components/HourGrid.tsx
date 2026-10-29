@@ -6,8 +6,8 @@ import { formatUsageDuration } from "../utils/usage";
 import { formatHour, HOURS } from "../utils/time";
 
 type Props = {
-  dayNotes: Record<string, string>,
-  disabled: boolean,
+  dayNotes: Record<string, string>;
+  disabled: boolean;
   currentHour: number;
   dayMarks: DayMarks;
   onSelectHour: (hour: number) => void;
@@ -43,8 +43,11 @@ export default function HourGrid({
         {HOURS.map((hour) => {
           const hasPassed = hour < currentHour;
           const isCurrent = hour === currentHour;
+          const isFuture = hour > currentHour;
 
-          const mark: HourMark | undefined = dayMarks[String(hour)];
+          const mark: HourMark | undefined =
+            dayMarks[String(hour)];
+
           const topApp = usageByHour[hour]?.[0];
 
           const statusLabel =
@@ -63,7 +66,7 @@ export default function HourGrid({
               {/* First action: classify the hour. */}
               <Pressable
                 onPress={() => onSelectHour(hour)}
-                disabled = {disabled}
+                disabled={disabled}
                 accessibilityRole="button"
                 accessibilityLabel={`${formatHour(hour)}, ${statusLabel}. Tap to classify.`}
                 style={({ pressed }) => [
@@ -85,9 +88,13 @@ export default function HourGrid({
                 >
                   {formatHour(hour)}
                 </Text>
+
                 {dayNotes[String(hour)] ? (
-                  <Text style={styles.notePreview} numberOfLines={2}>
-                  {dayNotes[String(hour)]}
+                  <Text
+                    style={styles.notePreview}
+                    numberOfLines={2}
+                  >
+                    {dayNotes[String(hour)]}
                   </Text>
                 ) : null}
 
@@ -124,17 +131,23 @@ export default function HourGrid({
                 )}
               </Pressable>
 
-              {/* Second action: open this hour's app-usage breakdown. */}
+              {/* Second action: open app usage for this hour. */}
               <Pressable
                 onPress={() => onShowUsage(hour)}
+                disabled={isFuture}
                 accessibilityRole="button"
                 accessibilityLabel={
-                  topApp
-                    ? `App usage for ${formatHour(hour)}. Most used: ${topApp.appName}, ${formatUsageDuration(topApp.totalTimeMs)}. Tap for all apps.`
-                    : `View app usage for ${formatHour(hour)}`
+                  isFuture
+                    ? `App usage for ${formatHour(hour)} is not available yet.`
+                    : topApp
+                      ? `App usage for ${formatHour(hour)}. Most used: ${topApp.appName}, ${formatUsageDuration(topApp.totalTimeMs)}. Tap for all apps.`
+                      : hasPassed
+                        ? `No apps used during ${formatHour(hour)}.`
+                        : `View app usage for ${formatHour(hour)}`
                 }
                 style={({ pressed }) => [
                   styles.usageButton,
+                  isFuture && styles.usageDisabled,
                   pressed && styles.usagePressed,
                 ]}
               >
@@ -149,19 +162,39 @@ export default function HourGrid({
                   ]}
                 >
                   <Text style={styles.appMonogramText}>
-                    {topApp ? topApp.appName.charAt(0).toUpperCase() : "·"}
+                    {topApp
+                      ? topApp.appName.charAt(0).toUpperCase()
+                      : hasPassed
+                        ? "–"
+                        : "·"}
                   </Text>
                 </View>
 
                 <View style={styles.appInfo}>
-                  <Text numberOfLines={1} style={styles.appName}>
-                    {topApp ? topApp.appName : "App usage"}
+                  <Text
+                    numberOfLines={1}
+                    style={styles.appName}
+                  >
+                    {topApp
+                      ? topApp.appName
+                      : hasPassed
+                        ? "No apps used"
+                        : isFuture
+                          ? "Future hour"
+                          : "App usage"}
                   </Text>
 
-                  <Text numberOfLines={1} style={styles.appDuration}>
+                  <Text
+                    numberOfLines={1}
+                    style={styles.appDuration}
+                  >
                     {topApp
                       ? formatUsageDuration(topApp.totalTimeMs)
-                      : "Tap for details"}
+                      : hasPassed
+                        ? "No usage recorded"
+                        : isFuture
+                          ? "Not available yet"
+                          : "Tap for details"}
                   </Text>
                 </View>
               </Pressable>
@@ -228,24 +261,47 @@ const styles = StyleSheet.create({
     letterSpacing: 0.35,
     marginTop: 7,
   },
-  unmarkedStatus: { color: "#666570" },
-  nowStatus: { color: colors.text },
+  unmarkedStatus: {
+    color: "#666570",
+  },
+  nowStatus: {
+    color: colors.text,
+  },
   wastedBox: {
     backgroundColor: colors.wastedBackground,
     borderColor: colors.wastedBorder,
   },
-  wastedText: { color: colors.wastedText },
-  wastedStatus: { color: colors.wastedStatus },
+  wastedText: {
+    color: colors.wastedText,
+  },
+  wastedStatus: {
+    color: colors.wastedStatus,
+  },
   notWastedBox: {
     backgroundColor: colors.notWastedBackground,
     borderColor: colors.notWastedBorder,
   },
-  notWastedText: { color: colors.notWastedText },
-  notWastedStatus: { color: colors.notWastedStatus },
-  currentBox: { borderColor: colors.text, borderWidth: 1.5 },
-  currentText: { fontWeight: "900" },
-  pressedBox: { opacity: 0.7, transform: [{ scale: 0.97 }] },
-  passedText: { textDecorationLine: "line-through", opacity: 0.8 },
+  notWastedText: {
+    color: colors.notWastedText,
+  },
+  notWastedStatus: {
+    color: colors.notWastedStatus,
+  },
+  currentBox: {
+    borderColor: colors.text,
+    borderWidth: 1.5,
+  },
+  currentText: {
+    fontWeight: "900",
+  },
+  pressedBox: {
+    opacity: 0.7,
+    transform: [{ scale: 0.97 }],
+  },
+  passedText: {
+    textDecorationLine: "line-through",
+    opacity: 0.8,
+  },
   crossOut: {
     position: "absolute",
     height: 2,
@@ -277,7 +333,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  usagePressed: { opacity: 0.65 },
+  usagePressed: {
+    opacity: 0.65,
+  },
+  usageDisabled: {
+    opacity: 0.4,
+  },
   appMonogram: {
     width: 13,
     height: 13,
@@ -290,7 +351,10 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: "900",
   },
-  appInfo: { flex: 1, minWidth: 0 },
+  appInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
   appName: {
     color: colors.text,
     fontSize: 7,
