@@ -32,6 +32,7 @@ export default function HomeScreen() {
 
   const { marksByDay, storageReady, setHourMark } = useHourMarks();
   const { accentId, accentColor, setAccentId } = useAccentColor();
+  const {  notesByDay, notesReady, setHourNote } = useHourNotes();
 
   const {
     permissionGranted,
@@ -50,6 +51,15 @@ export default function HomeScreen() {
     useState<number | null>(null);
 
   const todayKey = getDayKey(now);
+  
+  const todayNotes = notesByDay[todayKey] ?? {};
+
+  const selectedNote = selectedTarget ?
+                        notesByDay[selectedTarget.dayKey]?.[
+                          String(selectedTarget.hour)
+                        ] ?? ""
+                      : "";
+
   const todayMarks = marksByDay[todayKey] ?? {};
 
   const currentHour = now.getHours();
@@ -78,6 +88,16 @@ export default function HomeScreen() {
 
     setHourMark(selectedTarget.dayKey, selectedTarget.hour, mark);
     setSelectedTarget(null);
+  }
+
+  function saveSelectedNote(note: string) {
+    if(!selectedTarget) return;
+
+    setHourNote(
+      selectedTarget.dayKey,
+      selectedTarget.hour,
+      note
+    );
   }
 
   function openUsage(hour: number) {
@@ -137,6 +157,8 @@ export default function HomeScreen() {
         )}
 
         <HourGrid
+          disabled = {!storageReady || !notesReady}
+          dayNotes={todayNotes}
           currentHour={currentHour}
           dayMarks={todayMarks}
           onSelectHour={(hour) =>
@@ -182,6 +204,8 @@ export default function HomeScreen() {
       </ScrollView>
 
       <HourClassificationModal
+        selectedNote = {selectedNote}
+        onSaveNote = {saveSelectedNote}
         selectedTarget={selectedTarget}
         selectedMark={selectedMark}
         todayKey={todayKey}

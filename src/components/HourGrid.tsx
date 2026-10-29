@@ -6,6 +6,8 @@ import { formatUsageDuration } from "../utils/usage";
 import { formatHour, HOURS } from "../utils/time";
 
 type Props = {
+  dayNotes: Record<string, string>,
+  disabled: boolean,
   currentHour: number;
   dayMarks: DayMarks;
   onSelectHour: (hour: number) => void;
@@ -15,6 +17,8 @@ type Props = {
 };
 
 export default function HourGrid({
+  dayNotes,
+  disabled,
   currentHour,
   dayMarks,
   onSelectHour,
@@ -59,6 +63,7 @@ export default function HourGrid({
               {/* First action: classify the hour. */}
               <Pressable
                 onPress={() => onSelectHour(hour)}
+                disabled = {disabled}
                 accessibilityRole="button"
                 accessibilityLabel={`${formatHour(hour)}, ${statusLabel}. Tap to classify.`}
                 style={({ pressed }) => [
@@ -80,6 +85,11 @@ export default function HourGrid({
                 >
                   {formatHour(hour)}
                 </Text>
+                {dayNotes[String(hour)] ? (
+                  <Text style={styles.notePreview} numberOfLines={2}>
+                  {dayNotes[String(hour)]}
+                  </Text>
+                ) : null}
 
                 <Text
                   numberOfLines={1}
@@ -290,5 +300,13 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 6.5,
     marginTop: 2,
+  },
+  notePreview: {
+    color: colors.textMuted,
+    fontSize: 9,
+    lineHeight: 11,
+    textAlign: "center",
+    marginTop: 3,
+    paddingHorizontal: 3,
   },
 });
