@@ -40,11 +40,20 @@ export default function HourUsageModal({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <View style={styles.panel}>
+  {/* Tap outside the stats panel to close it */}
+  <Pressable
+    style={StyleSheet.absoluteFill}
+    onPress={onClose}
+    accessibilityRole="button"
+    accessibilityLabel="Close app usage statistics"
+  />
+
+  {/* Keep all your existing stats content inside this panel */}
+  <View style={styles.panel}>
           <View style={styles.header}>
             <View style={styles.headerText}>
               <Text style={styles.eyebrow}>APP USAGE</Text>
