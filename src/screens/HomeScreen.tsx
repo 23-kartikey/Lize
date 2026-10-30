@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useHourNotes } from "../hooks/useHourNotes";
+import AnalyticsScreen from "./AnalyticsScreen";
 
 import {
   Pressable,
@@ -33,6 +34,7 @@ export default function HomeScreen() {
   const { marksByDay, storageReady, setHourMark } = useHourMarks();
   const { accentId, accentColor, setAccentId } = useAccentColor();
   const {  notesByDay, notesReady, setHourNote } = useHourNotes();
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const {
     permissionGranted,
@@ -105,6 +107,15 @@ export default function HomeScreen() {
     void refreshUsage();
   }
 
+  if (showAnalytics) {
+  return (
+    <AnalyticsScreen
+      accentColor={accentColor}
+      onBack={() => setShowAnalytics(false)}
+    />
+  );
+}
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
@@ -118,6 +129,30 @@ export default function HomeScreen() {
           accentColor={accentColor}
           onSelectAccent={setAccentId}
         />
+
+        <Pressable
+          onPress={() => setShowAnalytics(true)}
+          style={{
+            alignSelf: "flex-end",
+            paddingVertical: 10,
+            paddingHorizontal: 13,
+            marginBottom: 12,
+            marginVertical: 8,
+            borderWidth: 1,
+            borderColor: accentColor,
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: accentColor,
+              fontSize: 11,
+              fontWeight: "800",
+            }}
+          >
+            VIEW ANALYTICS →
+          </Text>
+        </Pressable>
 
         <TimeSummary
           now={now}
